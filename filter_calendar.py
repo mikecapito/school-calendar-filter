@@ -16,6 +16,7 @@ import json
 import re
 import sys
 import urllib.request
+from datetime import datetime, timedelta
 from pathlib import Path
 
 
@@ -67,6 +68,35 @@ def get_event_searchable_text(event_block):
             else:
                 capturing = False
     return " ".join(searchable).lower()
+
+
+def get_event_start_date(event_block):
+    """Extract start date from a VEVENT block. Returns a datetime or None."""
+    for line in event_block.split("\n"):
+        if line.strip().upper().startswith("DTSTART"):
+            match = re.search(r"(\d{8})", line)
+            if match:
+                try:
+                    return datetime.strptime(match.group(1), "%Y%m%d")
+                except ValueError:
+                    return None
+    return None
+
+
+def is_too_old(event_block, config):
+    """Check if event is older than the configured cutoff. Returns (True, reason) or (False, None)."""
+    days_back = config.get("keep_days_back", 0)
+    if days_back <= 0:
+        return False, None
+
+    event_date = get_event_start_date(event_block)
+    if event_date is None:
+        return False, None  # Keep events we can't parse a date for
+
+    cutoff = datetime.now() - timedelta(days=days_back)
+    if event_date < cutoff:
+        return True, f"older than {days_back} days ({event_date.strftime('%Y-%m-%d')})"
+    return False, None
 
 
 def should_exclude(event_block, config):
@@ -135,6 +165,11 @@ def filter_calendar(ics_content, config):
     kept = []
     removed = []
     for event in events:
+        # Check date first (cheapest filter)
+        too_old, reason = is_too_old(event, config)
+        if too_old:
+            removed.append((get_event_summary(event), reason))
+            continue
         excluded, reason = should_exclude(event, config)
         if excluded:
             removed.append((get_event_summary(event), reason))

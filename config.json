@@ -5,7 +5,10 @@
   "_comment_2": "Where to save the filtered file (docs/ folder is served by GitHub Pages)",
   "output_file": "docs/filtered.ics",
 
-  "_comment_3": "EXCLUDE_KEYWORDS: Hide any event containing these words anywhere in title/description/location (case-insensitive)",
+  "_comment_3": "KEEP_DAYS_BACK: Drop events older than this many days.  0 = keep all past events.",
+  "keep_days_back": 30,
+
+  "_comment_4": "EXCLUDE_KEYWORDS: Hide any event containing these words anywhere in title/description/location (case-insensitive)",
   "exclude_keywords": [
     "staff development",
     "custodial",
