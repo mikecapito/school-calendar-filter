@@ -1,0 +1,27 @@
+{
+  "_comment_1": "Paste your school's ICS calendar URL below",
+  "calendar_url": "https://PASTE_YOUR_SCHOOL_CALENDAR_URL_HERE",
+
+  "_comment_2": "Where to save the filtered file (docs/ folder is served by GitHub Pages)",
+  "output_file": "docs/filtered.ics",
+
+  "_comment_3": "EXCLUDE_KEYWORDS: Hide any event containing these words anywhere in title/description/location (case-insensitive)",
+  "exclude_keywords": [
+    "staff development",
+    "custodial"
+  ],
+
+  "_comment_4": "EXCLUDE_EXACT: Hide events with this exact title (case-insensitive). Use this when a keyword would be too broad.",
+  "exclude_exact": [
+    "Board Meeting",
+    "PTA Executive Session"
+  ],
+
+  "_comment_5": "EXCLUDE_PATTERNS: Regex patterns matched against event title. For advanced filtering.",
+  "exclude_patterns": [
+    "^Board.*Meeting$"
+  ],
+
+  "_comment_6": "INCLUDE_KEYWORDS: If non-empty, ONLY events matching at least one keyword are kept (after excludes). Leave empty to keep everything not excluded.",
+  "include_keywords": []
+}
