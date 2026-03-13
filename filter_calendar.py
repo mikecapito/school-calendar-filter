@@ -187,7 +187,7 @@ def filter_calendar(ics_content, config):
         for title, reason in removed:
             print(f"    x {title}  [{reason}]")
 
-    return header + "".join(kept) + footer
+    return header + "\n".join(kept) + footer
 
 
 def main():
