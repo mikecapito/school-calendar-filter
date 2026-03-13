@@ -4,8 +4,9 @@ List all event titles from a school calendar feed.
 Helps you decide what to add to your exclude filters.
 
 Usage:
-  python list_events.py                  # Uses calendar_url from config.json
-  python list_events.py <calendar_url>   # Use a URL directly
+  python list_events.py                    # Show ALL events (unfiltered)
+  python list_events.py --filtered         # Show only events that survive your filters
+  python list_events.py <calendar_url>     # Use a URL directly
 """
 
 import json
@@ -13,6 +14,9 @@ import re
 import sys
 import urllib.request
 from collections import Counter
+
+# Import filter logic from filter_calendar.py
+from filter_calendar import should_exclude, should_include
 
 
 def fetch_calendar(url):
@@ -42,7 +46,6 @@ def get_event_date(event_block):
     """Extract start date from event."""
     for line in event_block.split("\n"):
         if line.strip().upper().startswith("DTSTART"):
-            # Handle both DTSTART:20240101 and DTSTART;VALUE=DATE:20240101
             match = re.search(r"(\d{8})", line)
             if match:
                 d = match.group(1)
@@ -51,22 +54,35 @@ def get_event_date(event_block):
 
 
 def main():
-    # Get URL from argument or config
-    if len(sys.argv) > 1 and sys.argv[1].startswith("http"):
-        url = sys.argv[1]
-    else:
-        try:
-            with open("config.json", "r") as f:
-                config = json.load(f)
-            url = config.get("calendar_url", "")
-        except FileNotFoundError:
+    args = sys.argv[1:]
+    filtered_mode = "--filtered" in args
+    args = [a for a in args if a != "--filtered"]
+
+    # Load config
+    config = {}
+    try:
+        with open("config.json", "r") as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        if not args:
             print("No config.json found and no URL provided.")
             print("Usage: python list_events.py <calendar_url>")
             sys.exit(1)
 
+    # Get URL from argument or config
+    if args and args[0].startswith("http"):
+        url = args[0]
+    else:
+        url = config.get("calendar_url", "")
+
     if not url:
         print("ERROR: No calendar URL found.")
         sys.exit(1)
+
+    if filtered_mode:
+        print("MODE: Showing only events that PASS your filters\n")
+    else:
+        print("MODE: Showing ALL events (use --filtered to apply filters)\n")
 
     print(f"Fetching calendar from: {url}\n")
     ics_content = fetch_calendar(url)
@@ -78,25 +94,45 @@ def main():
         print("No events found in feed.")
         sys.exit(0)
 
-    # Collect events with dates
-    events = []
+    # Collect events, optionally filtering
+    kept_events = []
+    removed_events = []
     for block in event_blocks:
         summary = get_event_summary(block)
         date = get_event_date(block)
-        events.append((date, summary))
+
+        if filtered_mode:
+            excluded, reason = should_exclude(block, config)
+            if excluded:
+                removed_events.append((date, summary, reason))
+                continue
+            if not should_include(block, config):
+                removed_events.append((date, summary, "no include keyword match"))
+                continue
+
+        kept_events.append((date, summary))
 
     # Sort by date
-    events.sort()
+    kept_events.sort()
+    removed_events.sort()
 
-    # Print all events
-    print(f"Found {len(events)} events:\n")
+    # Print kept events
+    print(f"Showing {len(kept_events)} events:\n")
     print(f"{'DATE':<12}  TITLE")
     print(f"{'-'*12}  {'-'*60}")
-    for date, summary in events:
+    for date, summary in kept_events:
         print(f"{date:<12}  {summary}")
 
-    # Print frequency of recurring titles
-    title_counts = Counter(summary for _, summary in events)
+    # If filtered, also show what was removed
+    if filtered_mode and removed_events:
+        print(f"\n\nRemoved {len(removed_events)} events:\n")
+        print(f"{'DATE':<12}  {'TITLE':<45}  REASON")
+        print(f"{'-'*12}  {'-'*45}  {'-'*30}")
+        for date, summary, reason in removed_events:
+            print(f"{date:<12}  {summary:<45}  {reason}")
+
+    # Print frequency of recurring titles (from kept events)
+    title_counts = Counter(summary for _, summary in kept_events)
     recurring = {t: c for t, c in title_counts.items() if c > 1}
 
     if recurring:
