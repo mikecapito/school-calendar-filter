@@ -1,6 +1,6 @@
 {
   "_comment_1": "Paste your school's ICS calendar URL below",
-  "calendar_url": "https://PASTE_YOUR_SCHOOL_CALENDAR_URL_HERE",
+  "calendar_url": "https://calendar.google.com/calendar/ical/acseht.org_4bqi18ntdhmt1k0htttjp39nn4%40group.calendar.google.com/public/basic.ics",
 
   "_comment_2": "Where to save the filtered file (docs/ folder is served by GitHub Pages)",
   "output_file": "docs/filtered.ics",
