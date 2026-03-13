@@ -8,7 +8,26 @@
   "_comment_3": "EXCLUDE_KEYWORDS: Hide any event containing these words anywhere in title/description/location (case-insensitive)",
   "exclude_keywords": [
     "staff development",
-    "custodial"
+    "custodial",
+    "Derby",
+    "Teen Refuge",
+    "Cougar Cub",
+    "MS/HS Compass",
+    "PTF: Coffee",
+    "Shadow Day",
+    "Butterfly",
+    "Drama Seminar",
+    "ACT Test",
+    "ACSI Acc",
+    "Junior Honor Society",
+    "Senior Trip",
+    "Middle School Missions",
+    "PSAT9",
+    "EE Spring",
+    "Kindergarten Grad",
+    "Green Gala",
+    "AP LIT",
+    "EE Family"
   ],
 
   "_comment_4": "EXCLUDE_EXACT: Hide events with this exact title (case-insensitive). Use this when a keyword would be too broad.",
@@ -19,7 +38,8 @@
 
   "_comment_5": "EXCLUDE_PATTERNS: Regex patterns matched against event title. For advanced filtering.",
   "exclude_patterns": [
-    "^Board.*Meeting$"
+    "^Board.*Meeting$",
+    "PTF.*Day"
   ],
 
   "_comment_6": "INCLUDE_KEYWORDS: If non-empty, ONLY events matching at least one keyword are kept (after excludes). Leave empty to keep everything not excluded.",
