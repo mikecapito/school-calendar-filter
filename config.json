@@ -46,7 +46,13 @@
     "School for K",
     "8th Grade",
     "MAPS Testing",
-    "Move It Monday"
+    "Move It Monday",
+    "Early Education",
+    "Early Ed",
+    "MS Retreat",
+    "MS Fall",
+    "Cougar Camp",
+    "Main Office Open"
   ],
 
   "_comment_4": "EXCLUDE_EXACT: Hide events with this exact title (case-insensitive). Use this when a keyword would be too broad.",
